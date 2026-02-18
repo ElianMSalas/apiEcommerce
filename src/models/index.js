@@ -4,6 +4,7 @@ const Product = require('./Product');
 const Order = require('./Order');
 const OrderItem = require('./OrderItem');
 const { sequelize } = require('../config/database');
+const { Sequelize } = require('sequelize');
 
 // User → Orders (un usuario tiene muchas órdenes)
 User.hasMany(Order, { foreignKey: 'userId', as: 'orders' });
@@ -27,4 +28,4 @@ const syncDB = async () => {
   console.log('Modelos sincronizados con la base de datos');
 };
 
-module.exports = { User, Category, Product, Order, OrderItem, syncDB };
+module.exports = { User, Category, Product, Order, OrderItem, syncDB, sequelize };

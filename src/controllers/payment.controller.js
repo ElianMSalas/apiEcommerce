@@ -1,5 +1,8 @@
 const stripe = require('../config/stripe');
 const { Order, OrderItem, Product } = require('../models/index');
+const { sendOrderConfirmationEmail } = require('../services/email.service');
+const { generateInvoicePDF } = require('../services/invoice.service');
+const { sequelize } = require('../config/database');
 
 // POST /api/payments/create-checkout-session
 const createCheckoutSession = async (req, res) => {
@@ -175,25 +178,73 @@ const handleWebhook = async (req, res) => {
 const handleCheckoutSessionCompleted = async (session) => {
   const orderId = session.metadata.orderId;
 
-  const order = await Order.findByPk(orderId);
+  const order = await Order.findOne({
+    where: { id: orderId },
+    include: [{
+      model: OrderItem,
+      as: 'items',
+      include: [{
+        model: Product,
+        as: 'product'
+      }]
+    }]
+  });
+
   if (!order) {
     console.error(`Orden ${orderId} no encontrada`);
     return;
   }
 
-  // Actualizar la orden
+  // Usamos transacción para seguridad
+await sequelize.transaction(async (t) => {
+
+  for (const item of order.items) {
+
+    // 🔒 BLOQUEO DE FILA (FOR UPDATE)
+    const product = await Product.findByPk(item.product.id, {
+      transaction: t,
+      lock: t.LOCK.UPDATE
+    });
+
+    if (!product) {
+      throw new Error(`Producto no encontrado`);
+    }
+
+    if (product.stock < item.quantity) {
+      throw new Error(`Stock insuficiente para ${product.name}`);
+    }
+
+    await product.decrement('stock', {
+      by: item.quantity,
+      transaction: t
+    });
+  }
+
   await order.update({
     status: 'paid',
     paymentStatus: 'completed',
     stripePaymentIntentId: session.payment_intent,
     paidAt: new Date(),
-  });
+  }, { transaction: t });
+
+});
+
 
   console.log(`Pago completado para orden ${order.orderNumber}`);
-  
-  // Aquí podrías enviar un email de confirmación
-  // await sendOrderConfirmationEmail(order);
+
+  try {
+    // Generar factura PDF
+    const invoicePath = await generateInvoicePDF(order);
+
+    // Enviar email con detalle y PDF
+    await sendOrderConfirmationEmail(order, session.customer_email, invoicePath);
+
+    console.log('Email y factura enviados');
+  } catch (error) {
+    console.error('Error enviando email:', error.message);
+  }
 };
+
 
 // Función auxiliar: Payment Intent exitoso
 const handlePaymentIntentSucceeded = async (paymentIntent) => {

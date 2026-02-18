@@ -150,15 +150,6 @@ const createOrder = async (req, res) => {
     }));
     await OrderItem.bulkCreate(itemsWithOrderId, { transaction });
 
-    // Descontar stock de cada producto
-    for (const item of orderItems) {
-      await Product.decrement('stock', {
-        by: item.quantity,
-        where: { id: item.productId },
-        transaction,
-      });
-    }
-
     await transaction.commit();
 
     // Limpiar carrito después de crear la orden
