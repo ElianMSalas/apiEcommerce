@@ -53,6 +53,24 @@ const Order = sequelize.define('Order', {
   paymentStatus: {
     type: DataTypes.ENUM('pending', 'completed', 'failed', 'refunded'),
     defaultValue: 'pending',
+    allowNull: false,
+  },
+  paymentMethod: {
+  type: DataTypes.STRING,
+  allowNull: true,
+  },
+  stripeSessionId: {
+  type: DataTypes.STRING,
+  allowNull: true,
+  unique: true,
+  },
+  stripePaymentIntentId: {
+  type: DataTypes.STRING,
+  allowNull: true,
+  },
+  paidAt: {
+  type: DataTypes.DATE,
+  allowNull: true,
   },
   notes: {
     type: DataTypes.TEXT,

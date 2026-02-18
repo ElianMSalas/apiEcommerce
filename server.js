@@ -1,4 +1,3 @@
-// server.js
 require('dotenv').config();
 
 const express = require('express');
@@ -14,38 +13,43 @@ const categoryRoutes = require('./src/routes/category.routes');
 const productRoutes = require('./src/routes/product.routes');
 const cartRoutes = require('./src/routes/cart.routes');
 const orderRoutes = require('./src/routes/order.routes');
+const paymentRoutes = require('./src/routes/payment.routes');
 
-// 👇 app debe declararse ANTES de cualquier app.use()
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middlewares globales
 app.use(helmet());
 app.use(cors());
 app.use(morgan('dev'));
+
+// 🔥 WEBHOOK PRIMERO (SIN express.json)
+app.post(
+  '/api/payments/webhook',
+  express.raw({ type: 'application/json' }),
+  require('./src/controllers/payment.controller').handleWebhook
+);
+
+// 🔥 DESPUÉS sí usamos express.json()
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rutas
+// Rutas normales
 app.use('/api/auth', authRoutes);
-
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
-
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/payments', paymentRoutes);
 
-// Salud del servidor
+// health
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Ruta no encontrada
 app.use((req, res) => {
   res.status(404).json({ message: 'Ruta no encontrada' });
 });
 
-// Manejo global de errores
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({
@@ -53,7 +57,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Arrancar
 const start = async () => {
   await connectDB();
   await syncDB();
