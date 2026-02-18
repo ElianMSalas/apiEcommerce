@@ -29,10 +29,13 @@ app.use((err, req, res, next) => {
     });
 });
 
+const { syncDB } = require('./src/models/index');
+
 const start = async () => {
-    await connectDB();
-    app.listen(PORT, () => {
-        console.log(`Servidor corriendo en http://localhost:${PORT}`)
-    });
+  await connectDB();
+  await syncDB();
+  app.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  });
 };
 start();
