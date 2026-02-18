@@ -10,7 +10,6 @@ const Category = sequelize.define('Category', {
   name: {
     type: DataTypes.STRING(100),
     allowNull: false,
-    unique: { msg: 'Ya existe una categoría con ese nombre' },
     validate: {
       notEmpty: { msg: 'El nombre no puede estar vacío' },
     },

@@ -24,7 +24,7 @@ OrderItem.belongsTo(Product, { foreignKey: 'productId', as: 'product' });
 // Sincronizar modelos con la base de datos
 const syncDB = async () => {
   await sequelize.sync({ alter: true });
-  console.log('✅ Modelos sincronizados con la base de datos');
+  console.log('Modelos sincronizados con la base de datos');
 };
 
 module.exports = { User, Category, Product, Order, OrderItem, syncDB };

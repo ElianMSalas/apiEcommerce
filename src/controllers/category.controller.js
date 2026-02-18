@@ -62,7 +62,7 @@ const create = async (req, res) => {
     const slug = generateSlug(name);
 
     // Verificar slug único
-    const existing = await Category.findOne({ where: { slug } });
+    const existing = await Category.findOne({ where: { slug, isActive: true } });
     if (existing) {
       return res.status(409).json({ message: 'Ya existe una categoría con ese nombre' });
     }
@@ -101,7 +101,7 @@ const update = async (req, res) => {
 
     if (name && name !== category.name) {
       const slug = generateSlug(name);
-      const existing = await Category.findOne({ where: { slug } });
+      const existing = await Category.findOne({ where: { slug, isActive: true } });
       if (existing && existing.id !== id) {
         return res.status(409).json({ message: 'Ya existe una categoría con ese nombre' });
       }
@@ -137,7 +137,6 @@ const remove = async (req, res) => {
       return res.status(404).json({ message: 'Categoría no encontrada' });
     }
 
-    // Verificar si tiene productos activos
     const productCount = await Product.count({
       where: { categoryId: id, isActive: true },
     });
@@ -150,8 +149,11 @@ const remove = async (req, res) => {
 
     if (category.image) await deleteImage(category.image);
 
-    // Soft delete — solo desactivar
-    await category.update({ isActive: false });
+    // Liberar slug y name agregando el id para evitar conflictos de unique
+    await category.update({
+      isActive: false,
+      slug: `${category.slug}-deleted-${id}`,
+    });
 
     return res.status(200).json({ message: 'Categoría eliminada exitosamente' });
   } catch (error) {

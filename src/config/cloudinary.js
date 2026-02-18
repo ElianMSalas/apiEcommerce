@@ -8,7 +8,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Storage para productos
 const productStorage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -18,7 +17,6 @@ const productStorage = new CloudinaryStorage({
   },
 });
 
-// Storage para categorías
 const categoryStorage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -28,38 +26,35 @@ const categoryStorage = new CloudinaryStorage({
   },
 });
 
-// Filtro de archivos
 const fileFilter = (req, file, cb) => {
   const allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Formato de imagen no válido. Use JPG, PNG o WebP'), false);
+    cb(new Error('Formato no válido. Use JPG, PNG o WebP'), false);
   }
 };
 
 const uploadProductImages = multer({
   storage: productStorage,
   fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB máximo
-}).array('images', 5); // máximo 5 imágenes
+  limits: { fileSize: 5 * 1024 * 1024 },
+}).array('images', 5);
 
 const uploadCategoryImage = multer({
   storage: categoryStorage,
   fileFilter,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB máximo
+  limits: { fileSize: 2 * 1024 * 1024 },
 }).single('image');
 
-// Helper para eliminar imagen de Cloudinary
 const deleteImage = async (imageUrl) => {
   try {
-    // Extraer public_id de la URL
     const urlParts = imageUrl.split('/');
     const publicIdWithExtension = urlParts.slice(-2).join('/');
     const publicId = publicIdWithExtension.replace(/\.[^/.]+$/, '');
     await cloudinary.uploader.destroy(publicId);
   } catch (error) {
-    console.error('Error eliminando imagen de Cloudinary:', error);
+    console.error('Error eliminando imagen:', error);
   }
 };
 

@@ -218,8 +218,12 @@ const remove = async (req, res) => {
       return res.status(404).json({ message: 'Producto no encontrado' });
     }
 
-    // Soft delete
-    await product.update({ isActive: false });
+    // Liberar slug y sku para evitar conflictos futuros
+    await product.update({
+      isActive: false,
+      slug: `${product.slug}-deleted-${id}`,
+      sku: product.sku ? `${product.sku}-deleted-${id}` : null,
+    });
 
     return res.status(200).json({ message: 'Producto eliminado exitosamente' });
   } catch (error) {
