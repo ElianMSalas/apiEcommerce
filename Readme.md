@@ -10,17 +10,17 @@ API RESTful completa para un sistema de ecommerce con autenticación, gestión d
 
 ## Características
 
-- ✅ **Autenticación JWT** - Registro, login, refresh tokens y gestión de sesiones
-- ✅ **Gestión de Productos** - CRUD completo con búsqueda, filtros y paginación
-- ✅ **Upload de Imágenes** - Integración con Cloudinary (hasta 5 imágenes por producto)
-- ✅ **Categorías** - Organización jerárquica de productos
-- ✅ **Carrito de Compras** - Sistema completo con validación de stock
-- ✅ **Órdenes** - Creación, seguimiento y gestión de órdenes
-- ✅ **Pagos con Stripe** - Checkout seguro, webhooks y confirmaciones
-- ✅ **Sistema de Roles** - Permisos granulares (user/admin)
-- ✅ **Documentación Swagger** - API docs interactiva y completa
-- ✅ **Validación Robusta** - Validación de datos con Joi
-- ✅ **Gestión de Stock** - Control automático de inventario
+- **Autenticación JWT** - Registro, login, refresh tokens y gestión de sesiones
+- **Gestión de Productos** - CRUD completo con búsqueda, filtros y paginación
+- **Upload de Imágenes** - Integración con Cloudinary (hasta 5 imágenes por producto)
+- **Categorías** - Organización jerárquica de productos
+- **Carrito de Compras** - Sistema completo con validación de stock
+- **Órdenes** - Creación, seguimiento y gestión de órdenes
+- **Pagos con Stripe** - Checkout seguro, webhooks y confirmaciones
+- **Sistema de Roles** - Permisos granulares (user/admin)
+- **Documentación Swagger** - API docs interactiva y completa
+- **Validación Robusta** - Validación de datos con Joi
+- **Gestión de Stock** - Control automático de inventario
 
 ## Tecnologías
 

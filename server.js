@@ -14,6 +14,8 @@ const productRoutes = require('./src/routes/product.routes');
 const cartRoutes = require('./src/routes/cart.routes');
 const orderRoutes = require('./src/routes/order.routes');
 const paymentRoutes = require('./src/routes/payment.routes');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./src/config/swagger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,14 +24,18 @@ app.use(helmet());
 app.use(cors());
 app.use(morgan('dev'));
 
-// 🔥 WEBHOOK PRIMERO (SIN express.json)
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Ecommerce API Docs',
+}));
+
 app.post(
   '/api/payments/webhook',
   express.raw({ type: 'application/json' }),
   require('./src/controllers/payment.controller').handleWebhook
 );
 
-// 🔥 DESPUÉS sí usamos express.json()
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
