@@ -9,6 +9,8 @@ const morgan = require('morgan');
 const { connectDB } = require('./src/config/database');
 const { syncDB } = require('./src/models/index');
 const authRoutes = require('./src/routes/auth.routes');
+const categoryRoutes = require('./src/routes/category.routes');
+const productRoutes = require('./src/routes/product.routes');
 
 // 👇 app debe declararse ANTES de cualquier app.use()
 const app = express();
@@ -23,6 +25,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Rutas
 app.use('/api/auth', authRoutes);
+
+app.use('/api/categories', categoryRoutes);
+app.use('/api/products', productRoutes);
 
 // Salud del servidor
 app.get('/health', (req, res) => {
